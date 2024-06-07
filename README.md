@@ -1,4 +1,4 @@
-# Project on Solidity
+# Project on Solidity Smart Contract
 
 For this project, write a smart contract that implements the require(), assert() and revert() statements.
 
