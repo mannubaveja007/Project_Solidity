@@ -1,40 +1,74 @@
 // For this project, write a smart contract that implements the require(), assert() and revert() statements.
 
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+contract TrainSystem{
 
-    
-contract transaction {
-    function test(uint _input) public pure returns(string memory){
-        if ( _input > 999 ether){
-            revert("Not possible");
-        }
-        else if(_input <500){
-            return "NO! Funds";
-        }
-        else{
-            return "WOrked!";
-        }
-        // return "Even";
+    struct Passenger{
+        string Name;
+        bool hasTkt;
+    }
+    Passenger[]  passengers;
+    function AddPassenger(string memory _name , bool _tkt) public {
+        Passenger memory newPassenger = Passenger( {
+            Name : _name,
+            hasTkt : _tkt
+        });
+        passengers.push(newPassenger);
     }
 
-    uint public bal;
-    constructor(){
-        bal=address(this).balance;
+    function getPassengerCount() public view returns (uint) {
+        return passengers.length;
     }
-    function  withdraw(uint _val) public  returns(string memory){
-        require(bal>_val,"insufficient funds");
-        bal-=_val;
-        payable(msg.sender).transfer(_val); 
-        return "Withdrawal successful!";
-    }
-    function SendTo(address _friend,uint _value) public view returns(string memory){
-        assert(bal>_value);
-        return "Yes , you have funds to send money to your friend...";
+    function GetPassenger(uint _index) public  view returns(string memory, bool){
+        require(_index < passengers.length,"Not Found"); // to check the index num  
+        // and get data
+        Passenger storage passenger= passengers[_index];
+        return (passenger.Name , passenger.hasTkt);
+
     }
     
+    uint public currentTime = block.timestamp;
+    uint public scheduledDepartureTime = 10; 
+
+    function AllPassengerHaveTicket() public view returns(bool){
+        for(uint i =0;i<passengers.length;i++){
+            if(!passengers[i].hasTkt)
+                revert ("Not all passengers have ticket");
+        }
+        return true;
+    }
     
+modifier checkDepartureConditions() {
+    require( currentTime >= scheduledDepartureTime && AllPassengerHaveTicket(), "Cannot depart, conditions not met.");
+    _;
+}
+
+
+
+function departTrain() checkDepartureConditions external view returns(string memory){
+    // Train Went from station to next station 
+    return ("TRAIN DEPARTED!");
+}
+
+function CheckTkt() internal view {
+    assert(AllPassengerHaveTicket());
+
+}
+function Emergency () external pure  {
     
+    revert("Emergency has occured!");
+    
+}
+
+
+
+
+
+
+
+
+
+
 }
